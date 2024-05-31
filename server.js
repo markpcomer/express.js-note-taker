@@ -1,57 +1,21 @@
+//Import express package
 const express = require('express');
+
+//Initialize our app variable by setting it to the value of express()
 const app = express();
-const fs = require('fs');
-const path = require('path');
+
+//Create a PORT variable
+const PORT = process.env.PORT || 3001;
 
 const apiRoutes = require('./routes/apiRoutes');
 const htmlRoutes = require('./routes/htmlRoutes');
 
-const PORT = process.env.PORT || 3001;
-
-
-app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(express.static('public'));
+
 app.use('/api', apiRoutes);
 app.use('/', htmlRoutes);
-
-/*
-
-On the back end, the application should include a db.json file that 
-will be used to store and retrieve notes using the fs module.
-
-The following HTML routes should be created:
-
-GET /notes should return the notes.html file.
-
-GET * should return the index.html file.
-
-The following API routes should be created:
-
-GET /api/notes should read the db.json file and return all 
-saved notes as JSON.
-
-POST /api/notes should receive a new note to save on the request body, 
-add it to the db.json file, and then return the new note to the client. You'll need to find a way to give each note a unique id when it's saved (look into npm packages that could do this for you).
-
-
-
-
-// GET Route for homepage
-app.get('/', (req, res) =>
-  res.sendFile(path.join(__dirname, '/public/index.html'))
-);
-
-// GET Route for feedback page
-app.get('/feedback', (req, res) =>
-  res.sendFile(path.join(__dirname, '/public/pages/feedback.html'))
-);
-
-// Wildcard route to direct users to a 404 page
-app.get('*', (req, res) =>
-  res.sendFile(path.join(__dirname, '/public/index.html'))
-);
-*/
 
 
 app.listen(PORT, () =>
