@@ -1,70 +1,94 @@
+const util = require('util');
+const fs = require('fs');
 
+const { v4: uuidv4 } = require('uuid');
+const { join } = require('path');
 
+const readFileAsync = util.promisify(fs.readFile);
+const writeFileAsync = util.promisify(fs.writeFile);
 
+const filePath = './db/db.json';
 
-// const fs = require('fs');
-// const util = require('util');
-// const { v4: uuidv4 } = require('uuid');
+/// Mini-project example
+/*
+const readAndAppend = (content, file) => {
+  fs.readFile(file, 'utf8', (err, data) => {
+    if (err) {
+      console.error(err);
+    } else {
+      const parsedData = JSON.parse(data);
+      parsedData.push(content);
+      writeToFile(file, parsedData);
+    }
+  });
+};
+*/
 
-// // Promisifying fs methods
-// const readFileAsync = util.promisify(fs.readFile);
-// const writeFileAsync = util.promisify(fs.writeFile);
+// Func to read notes from db.json
+function getNotes(req,res){
+  fs.readFile(filePath, 'utf-8', (error, fileContent) => {
+    if (error) throw error;
+      console.error('Failed to get note',error);
+      
+      const parsedData = JSON.parse(fileContent);
+      return res.send(parsedData);
+    }
+  )}
+    
+ 
 
-// async function readNote() {
-//     try {
-//         const data = await readFileAsync("./db/db.json", 'utf-8');
-//         return JSON.parse(data);
-//     } catch (error) {
-//         console.log("Error reading from file", error);
-//         return [];
+function addNote(req, res){
+  const { title, text } = req.body;
+  if (!title || !text) {
+    throw new Error('Make sure to enter both Title & Text');
+  }
+
+  const noteID = uuidv4();
+
+  const note = {
+    id: noteID,
+    title: title,
+    text: text
+  };
+
+  fs.readFile(filePath, 'utf-8', (error, fileContent) => {
+    if (error) {
+      console.error('Could not read note', error)
+    } else {
+      const parsedData = JSON.parse(fileContent);
+      parsedData.push(note);
+
+      let newFile = JSON.stringify(parsedData);
+
+      fs.writeFile(filePath, newFile, 'utf-8', function(error) {
+        if (error) {
+          console.error('Error writing new note', error);
+        }
+      })
+    }
+    console.log('New note added');
+    return res.send(JSON.parse(newFile))
+  })
+}
+
+// function deleteNote(req,res) {
+//   fs.readFile(filePath, 'utf-8', function(error, fileContent) {
+//     if(error){
+//       console.error('Error deleting note', err);
+//     } else {
+//       const deletedNote = req.params.id;
+//       const parsedData = JSON.parse(fileContent);
 //     }
-// };
+//   })
+// }
 
-// async function writeNote(data) {
-//     try {
-//         await writeFileAsync("./db/db.json", JSON.stringify(data)); 
-//     } catch (error) {
-//         console.log("Error writing to file", error);
-//     }
-// };
 
-// async function getNotes(){
-//     try {
-//         const notes = await readNote();
-//         let result;
-//         if(Array.isArray(notes) && notes.length > 0) {
-//             result = notes;
-//         } else {
-//             result = [];
-//         }
-//         return result;
-//     } catch (error) {
-//         console.log("Cannot read note", error);
-//     }
-// };
+   
 
-// async function addNote(note) {
-//     const { title, text } = note;
-//     if(!title || !text) {
-//         throw new Error("Enter title and/or text");
-//     }
-//     const newNote = { title, text, id: uuidv4() }; // Generating UUID using uuidv4()
-//     const allNotes = await getNotes();
-//     allNotes.push(newNote);
-//     await writeNote(allNotes);
-//     return newNote;
-// };
 
-// async function deleteNote(id) {
-//     const allNotes = await getNotes();
-//     const filteredNotes = allNotes.filter((note) => note.id !== id);
-//     await writeNote(filteredNotes);
-// };
+module.exports = {
+  getNotes, addNote
+};
 
-// module.exports = {
-//     readNote,
-//     writeNote,
-//     getNotes,
-//     addNote,
-//     deleteNote
-// };
+
+
