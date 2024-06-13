@@ -2,12 +2,11 @@ const util = require('util');
 const fs = require('fs');
 
 const { v4: uuidv4 } = require('uuid');
-const { join } = require('path');
-
+//const { join } = require('path');
 const readFileAsync = util.promisify(fs.readFile);
 const writeFileAsync = util.promisify(fs.writeFile);
 
-const filePath = './db/db.json';
+//const filePath = './db/db.json';
 
 /// Mini-project example
 /*
@@ -23,17 +22,47 @@ const readAndAppend = (content, file) => {
   });
 };
 */
+class NoteDB {
+  read() {
+    return readFileAsync('db/db.json', 'utf-8');
+  }
+  write(note) {
+    return writeFileAsync('db/db.json', JSON.stringify(note));
+  }
+  getNotes() {
+    return this.read().then((notes) => {
+      let displayNotes;
+      try {
+        displayNotes = [].concat(JSON.parse(notes))
+      } catch (error) {
+        displayNotes = [];
+      }
+      return displayNotes;
+    })
+  addNote(note) {
+    // define note 
+    // define new note
+    /*
+    // Add a unique id to the note using uuid package
+    const newNote = { title, text, id: uuidv1() };
 
+    // Get all notes, add the new note, write all the updated notes, return the newNote
+    */
+
+    return this.getNotes() // create .then, pass new note, update it
+  }
+  removeNote(id) {
+    return this.getNotes()
+  }
+}
 // Func to read notes from db.json
-function getNotes(req,res){
+
   fs.readFile(filePath, 'utf-8', (error, fileContent) => {
     if (error) throw error;
-      console.error('Failed to get note',error);
-      
-      const parsedData = JSON.parse(fileContent);
-      return res.send(parsedData);
-    }
-  )}
+    const parsedData = JSON.parse(fileContent);
+    return res.send(parsedData)
+  })
+}
     
  
 
@@ -43,10 +72,8 @@ function addNote(req, res){
     throw new Error('Make sure to enter both Title & Text');
   }
 
-  const noteID = uuidv4();
-
   const note = {
-    id: noteID,
+    id: uuidv4(),
     title: title,
     text: text
   };
