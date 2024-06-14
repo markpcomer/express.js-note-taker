@@ -16,7 +16,7 @@
 //       res.status(500).send('Failed to get notes');
 //     }
 //   }
-router.get('/notes', (req, res) => {
+router.get('api/notes', (req, res) => {
   noteDB
   .getNotes()
   .then((notes) => {
@@ -25,37 +25,48 @@ router.get('/notes', (req, res) => {
   .catch((error) => {
     res.status(500).json(error);
   })
-})
+});
 
-async function addNote(req, res) {
-    const { title, text } = req.body; // add to addNote
-    if (!title || !text) {
-      return res.status(400).send('Make sure to enter both Title & Text');
-    }
+router.post('api/notes', (req, res) => {
+  noteDB
+  .addNote(req.body)
+  .then(function(note) {
+    res.json(note);
+  })
+  .catch(function(err) {
+    res.status(500).json(err);
+  })
+});
+
+// async function addNote(req, res) {
+//     const { title, text } = req.body; // add to addNote
+//     if (!title || !text) {
+//       return res.status(400).send('Make sure to enter both Title & Text');
+//     }
   
-    const note = {
-      id: uuidv4(),
-      title: title,
-      text: text
-    };
+//     const note = {
+//       id: uuidv4(),
+//       title: title,
+//       text: text
+//     };
   
-    try {
-      const fileContent =  await fs.readFile(filePath, 'utf-8');
-      const parsedData = JSON.parse(fileContent);
-      parsedData.push(note);
-      const newFile = JSON.stringify(parsedData);
-      await fs.writeFile(filePath, newFile, 'utf-8');
-      console.log('New note added');
-      res.json(note);
-    } catch (error) {
-      console.error('Failed to add note', error);
-      res.status(500).send('Failed to add note');
-    }
-  }
+//     try {
+//       const fileContent =  await fs.readFile(filePath, 'utf-8');
+//       const parsedData = JSON.parse(fileContent);
+//       parsedData.push(note);
+//       const newFile = JSON.stringify(parsedData);
+//       await fs.writeFile(filePath, newFile, 'utf-8');
+//       console.log('New note added');
+//       res.json(note);
+//     } catch (error) {
+//       console.error('Failed to add note', error);
+//       res.status(500).send('Failed to add note');
+//     }
+//   }
   
 
-router.get('/notes', getNotes);
-router.post('/notes', addNote);
+
+
 
 
  
