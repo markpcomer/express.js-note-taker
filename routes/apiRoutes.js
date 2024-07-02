@@ -1,103 +1,90 @@
- const router = require('express').Router();
- //const fs = require('fs').promises;
- //const { v4: uuidv4 } = require('uuid');
- //const filePath = './db/db.json';
- const noteDB = require('../db/noteDB');
+ const express = require('express');
+ const router = express.Router();
+ const {
+  readNote,
+  writeNote,
+  getNotes,
+  addNote
+} = require('../db/noteDB');
 
-// Function to read notes from db.json
-// async function getNotes(req, res) {
-//     try {
-//       const fileContent = await fs.readFile(filePath, 'utf-8');
-//       const parsedData = JSON.parse(fileContent);
-//       console.log(parsedData);
-//       res.json(parsedData.notesArray);
-//     } catch (error) {
-//       console.error('Failed to read file', error);
-//       res.status(500).send('Failed to get notes');
-//     }
-//   }
-router.get('api/notes', (req, res) => {
-  noteDB
-  .getNotes()
-  .then((notes) => {
-    return res.json(notes);
-  })
-  .catch((error) => {
-    res.status(500).json(error);
-  })
+router.get('/notes', (req, res) => {
+
+  getNotes()
+    .then(function (notes) {
+      return res.json(notes);
+    })
+    .catch(function(error) {
+      res.status(500).json(error);
+    })
 });
 
-router.post('api/notes', (req, res) => {
-  noteDB
-  .addNote(req.body)
-  .then(function(note) {
-    res.json(note);
-  })
-  .catch(function(err) {
-    res.status(500).json(err);
-  })
+router.post('/notes', (req, res) => {
+  addNote(req.body)
+    .then(function(note) {
+      res.json(note);
+    })
+    .catch(function(error) {
+      res.status(500).json(error);
+    })
 });
 
-// async function addNote(req, res) {
-//     const { title, text } = req.body; // add to addNote
-//     if (!title || !text) {
-//       return res.status(400).send('Make sure to enter both Title & Text');
-//     }
-  
-//     const note = {
-//       id: uuidv4(),
-//       title: title,
-//       text: text
-//     };
-  
-//     try {
-//       const fileContent =  await fs.readFile(filePath, 'utf-8');
-//       const parsedData = JSON.parse(fileContent);
-//       parsedData.push(note);
-//       const newFile = JSON.stringify(parsedData);
-//       await fs.writeFile(filePath, newFile, 'utf-8');
-//       console.log('New note added');
-//       res.json(note);
-//     } catch (error) {
-//       console.error('Failed to add note', error);
-//       res.status(500).send('Failed to add note');
-//     }
-//   }
-  
-
-
-
-
-
- 
 module.exports = router;
 
 
 
-//  router.get('/notes', async (req, res) => {
-//      try {
-//          const notes = await getNotes();
-//          res.json(notes);
-//      } catch (err) {
-//          res.status(500).json(err);
-//      }
-//  });
- 
-//  router.post('/notes', async (req, res) => {
-//      try {
-//          const note = await addNote(req.body);
-//          res.json(note);
-//      } catch (err) {
-//          res.status(500).json(err);
-//      }
-//  });
- 
-//  router.delete('/api/notes/:id', async (req, res) => {
-//      try {
-//          await DB.deleteNote(req.params.id);
-//          res.json({ ok: true });
-//      } catch (err) {
-//          res.status(500).json(err);
-//      }
-//  });
- 
+
+
+
+
+
+ /*
+ router.get('/notes', (req, res) => {
+  console.log('GET request to /api/notes'); // Add this line
+  fs.readFile(path.join(__dirname, '../db/db.json'), 'utf8', (error, data) => {
+    if (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Internal server error'});
+      return;
+    }
+    try {
+      const notes = JSON.parse(data);
+      res.json(notes);
+    } catch (error) {
+      console.error('Error parsing JSON:', error);
+      res.status(500).json({ error: 'Error parsing JSON data' });
+    }
+
+  });
+ });
+
+ router.post('/notes', (req, res) => {
+  console.log('POST request to /api/notes');
+  fs.readFile(path.join(__dirname, '../db/db.json'), 'utf8', (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).json({ error: 'Internal server error' });
+    }
+    try {
+      const notes = JSON.parse(data);
+      const newNote = req.body;
+      newNote.id = uuidv4();
+      notes.push(newNote); 
+
+      fs.writeFile(path.join(__dirname, '../db/db.json'), JSON.stringify(notes, null, 2), (err) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ error: 'Internal server error' });
+      }
+      res.json(newNote);
+    });
+    } catch (error) {
+      console.error('Error handling POST request:', error);
+      res.status(500).json({ error: 'Error handling Post request'});
+    }
+  });
+  })
+*/
+
+
+
+

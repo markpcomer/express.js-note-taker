@@ -2,54 +2,82 @@ const util = require('util');
 const fs = require('fs');
 
 const { v4: uuidv4 } = require('uuid');
-//const { join } = require('path');
-const readFileAsync = util.promisify(fs.readFile);
-const writeFileAsync = util.promisify(fs.writeFile);
+const path = require('path');
 
+const readFromFile = util.promisify(fs.readFile);
+const writeToFile = util.promisify(fs.writeFile);
 
-class NoteDB {
-  read() {
-    return readFileAsync('db/db.json', 'utf-8');
+  
+function readNote() {
+    readFromFile('db/db.json', 'utf8');
+}
+
+function writeNote(note) {
+    const jsonNote = JSON.stringify(note);
+    return writeToFile('db/db.json', jsonNote);
+}
+
+function getNotes() {
+    return readFromFile('db/db.json', 'utf8')
+        .then((notes) => {
+            let jsonNotes;
+
+        try {
+          jsonNotes = [].concat(JSON.parse(notes));
+        } catch (err) {
+          jsonNotes = [];
+        }
+        return jsonNotes;
+        })
+        .catch((err) => {
+            console.error('Error reading file', err);
+            return [];
+        })
+}
+
+function addNote(note) {
+    const { title, text } = note;
+    const newNote = { title, text, id: uuidv4() };
+    if (!title || !text) {
+      throw new Error("Please enter title and text");
+    }
+    return getNotes()
+      .then(function(notes) {
+        return notes.concat(newNote);
+      })
+      .then(function(updatedNotes) {
+        return writeNote(updatedNotes);
+      })
+      .then(function() {
+        return newNote;
+      })
   }
-  write(note) {
-    return writeFileAsync('db/db.json', JSON.stringify(note));
-  }
-  getNotes() {
-    return this.read().then((notes) => {
-      let displayNotes;
-      try {
-        displayNotes = [].concat(JSON.parse(notes))
-      } catch (error) {
-        displayNotes = [];
-      }
-      return displayNotes;
-    })
-  }
 
-//   addNote(note) {
-//     // define note 
-//     // define new note
-//     /*
-//     // Add a unique id to the note using uuid package
-//     const newNote = { title, text, id: uuidv1() };
+module.exports = {
+    readNote,
+    writeNote,
+    getNotes,
+    addNote
+}
 
-//     // Get all notes, add the new note, write all the updated notes, return the newNote
-//     */
 
-//     return this.getNotes() // create .then, pass new note, update it
-//   };
-//   removeNote(id) {
-//     return this.getNotes()
-//   }
-// }
-// Func to read notes from db.json
 
-//   fs.readFile(filePath, 'utf-8', (error, fileContent) => {
-//     if (error) throw error;
-//     const parsedData = JSON.parse(fileContent);
-//     return res.send(parsedData)
-//   })
-// }
+
+
+
+
+
+/*
+
+
+
+
+
+
+
+
+
+
     
   addNote(note){
   const { title, text } = note;
@@ -58,9 +86,9 @@ class NoteDB {
   }
 
   const newNote = {
-    id: uuidv4(),
     title: title,
-    text: text
+    text: text,
+    id: uuidv4(),
   };
 
   return this.getNotes()
@@ -108,6 +136,6 @@ class NoteDB {
 
 
   module.exports = new NoteDB;
-
+*/
 
 
