@@ -35,8 +35,8 @@ function getNotes() {
         })
 }
 
-function addNote(note) {
-    const { title, text } = note;
+function addNote(addedNote) {
+    const { title, text } = addedNote;
     const newNote = { title, text, id: uuidv4() };
     if (!title || !text) {
       throw new Error("Please enter title and text");
@@ -50,6 +50,9 @@ function addNote(note) {
       })
       .then(function() {
         return newNote;
+      })
+      .catch((err) => {
+        console.error('Error writing file', err);
       })
   }
 
